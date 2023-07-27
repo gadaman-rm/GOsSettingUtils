@@ -112,3 +112,26 @@ void GOsSettingUtils::selectTab(const char *tabName)
     DEBUG_MSG("Error: Tab not found.");
   }
 }
+
+std::vector<String> GOsSettingUtils::getAllTabNames()
+{
+  std::vector<String> tabNames;
+  for (const auto &tab : tabs)
+  {
+    tabNames.push_back(tab.first);
+  }
+  return tabNames;
+}
+
+std::vector<String> GOsSettingUtils::getAllParamsInTab(const char *tabName)
+{
+  std::vector<String> paramNames;
+  if (tabs.count(tabName) > 0)
+  {
+    for (const auto &param : tabs[tabName])
+    {
+      paramNames.push_back(param.first);
+    }
+  }
+  return paramNames;
+}

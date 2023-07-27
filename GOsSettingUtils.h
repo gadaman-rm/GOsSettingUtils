@@ -30,6 +30,12 @@ public:
   // Function to select the current tab
   void selectTab(const char *tabName);
 
+  // Function to get all tab names as a vector
+  std::vector<String> getAllTabNames();
+
+  // Function to get all parameter names within a tab as a vector
+  std::vector<String> getAllParamsInTab(const char *tabName);
+
 private:
   bool initialized;
   struct Parameter
