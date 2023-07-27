@@ -4,11 +4,11 @@
 #include <Arduino.h>
 #include <LittleFS.h>
 #include <iot_debug.h>
-#include <ArduinoJson.h>
 #include <map>
 #include <vector>
 
-class GOsSettingUtils {
+class GOsSettingUtils
+{
 public:
   GOsSettingUtils();
 
@@ -16,32 +16,28 @@ public:
   void createSettingList();
 
   // Add a new tab with parameters
-  void addTab(const char* tabName);
+  void addTab(const char *tabName);
 
   // Add a parameter to the current tab
-  void addParam(const char* paramName, const char* paramType);
+  void addParam(const char *paramName, const char *paramType);
 
   // Function to get the value of a parameter by its name
-  String getParamValue(const char* paramName);
+  String getParamValue(const char *paramName);
 
   // Function to set the value of a parameter by its name
-  void setParamValue(const char* paramName, const char* paramValue);
+  void setParamValue(const char *paramName, const char *paramValue);
 
   // Function to select the current tab
-  void selectTab(const char* tabName);
-
-  // Function to get a list of all tab names
-  std::vector<String> getAllTabs();
+  void selectTab(const char *tabName);
 
 private:
   bool initialized;
-
-  // Private variables and functions for internal use
-  struct Parameter {
+  struct Parameter
+  {
     String type;
     String value;
   };
-
+  // Private variables and functions for internal use
   std::map<String, std::map<String, Parameter>> tabs;
   String currentTab;
 };
