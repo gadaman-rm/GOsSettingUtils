@@ -22,31 +22,6 @@ bool GOsSettingUtils::begin()
   return true;
 }
 
-void GOsSettingUtils::createSettingList()
-{
-  if (!initialized)
-  {
-    DEBUG_MSG("LittleFS not initialized. Call begin() first!");
-    return;
-  }
-
-  File settingListFile = LittleFS.open("/settingList.lst", "w");
-  if (!settingListFile)
-  {
-    DEBUG_MSG("Failed to create settingList.lst file!");
-    return;
-  }
-
-  Dir dir = LittleFS.openDir("/");
-  while (dir.next())
-  {
-    settingListFile.println(dir.fileName());
-  }
-
-  settingListFile.close();
-  DEBUG_MSG("File list created successfully!");
-}
-
 void GOsSettingUtils::addTab(const char *tabName)
 {
   currentTab = tabName;
@@ -62,6 +37,25 @@ void GOsSettingUtils::addParam(const char *paramName, const char *paramType)
   }
 
   tabs[currentTab][paramName] = {paramType, ""};
+}
+
+String GOsSettingUtils::getParamType(const char *paramName)
+{
+  if (currentTab == "")
+  {
+    DEBUG_MSG("Error: No active tab. Please call addTab() first.");
+    return "";
+  }
+
+  if (tabs[currentTab].count(paramName) > 0)
+  {
+    return tabs[currentTab][paramName].type;
+  }
+  else
+  {
+    DEBUG_MSG("Error: Parameter not found in the current tab.");
+    return "";
+  }
 }
 
 String GOsSettingUtils::getParamValue(const char *paramName)
@@ -134,4 +128,39 @@ std::vector<String> GOsSettingUtils::getAllParamsInTab(const char *tabName)
     }
   }
   return paramNames;
+}
+
+bool GOsSettingUtils::writeToJsonFile()
+{
+  if (!initialized)
+  {
+    DEBUG_MSG("LittleFS not initialized. Call begin() first!");
+    return false;
+  }
+
+  DynamicJsonDocument jsonDocument(2048); // Set the size of the JSON document
+
+  // Iterate through all the tabs
+  for (const auto &tab : tabs)
+  {
+    JsonArray paramArray = jsonDocument.createNestedArray(tab.first);
+    for (const auto &param : tab.second)
+    {
+      JsonObject paramObject = paramArray.createNestedObject();
+      paramObject["name"] = param.first;
+      paramObject["type"] = param.second.type;
+      paramObject["value"] = param.second.value;
+    }
+  }
+  File settingListFile = LittleFS.open("/settingList.lst", "w");
+  if (!settingListFile)
+  {
+    DEBUG_MSG("Failed to create settingList.lst file!");
+    return false;
+  }
+  serializeJson(jsonDocument, settingListFile);
+  settingListFile.close();
+  DEBUG_MSG("JSON data written to settingList.lst successfully!");
+
+  return true;
 }

@@ -3,7 +3,9 @@
 
 #include <Arduino.h>
 #include <LittleFS.h>
+//#define DEBUG_THROW_SERIAL
 #include <iot_debug.h>
+#include <ArduinoJson.h>
 #include <map>
 #include <vector>
 
@@ -13,13 +15,15 @@ public:
   GOsSettingUtils();
 
   bool begin();
-  void createSettingList();
 
   // Add a new tab with parameters
   void addTab(const char *tabName);
 
   // Add a parameter to the current tab
   void addParam(const char *paramName, const char *paramType);
+
+  // Function to get the type of a parameter by its name
+  String getParamType(const char *paramName);
 
   // Function to get the value of a parameter by its name
   String getParamValue(const char *paramName);
@@ -35,6 +39,8 @@ public:
 
   // Function to get all parameter names within a tab as a vector
   std::vector<String> getAllParamsInTab(const char *tabName);
+
+  bool writeToJsonFile();
 
 private:
   bool initialized;
