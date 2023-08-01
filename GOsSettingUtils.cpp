@@ -164,3 +164,68 @@ bool GOsSettingUtils::writeToJsonFile()
 
   return true;
 }
+
+bool GOsSettingUtils::loadFromSettingsFile()
+{
+  if (!initialized)
+  {
+    DEBUG_MSG("LittleFS not initialized. Call begin() first!");
+    return false;
+  }
+
+  // Check if the settings file exists for the current tab
+  String fileName = "/" + currentTab + ".setting";
+  if (!LittleFS.exists(fileName))
+  {
+    DEBUG_MSG("Settings file not found for the current tab.");
+    return false;
+  }
+
+  File settingsFile = LittleFS.open(fileName, "r");
+  if (!settingsFile)
+  {
+    DEBUG_MSG("Failed to open settings file!");
+    return false;
+  }
+
+  // Parse the JSON data from the file
+  DynamicJsonDocument jsonDocument(2048);
+  DeserializationError error = deserializeJson(jsonDocument, settingsFile);
+  settingsFile.close();
+
+  if (error)
+  {
+    DEBUG_MSG("Failed to parse JSON data from the settings file!");
+    return false;
+  }
+
+  // Iterate through all the parameters in the JSON data and update the values in the current tab
+  JsonObject root = jsonDocument.as<JsonObject>();
+  for (const auto &param : root)
+  {
+    if (tabs[currentTab].count(param.key().c_str()) > 0)
+    {
+      tabs[currentTab][param.key().c_str()].value = param.value().as<String>();
+    }
+  }
+
+  DEBUG_MSG("Settings loaded from file successfully!");
+
+  return true;
+}
+
+String GOsSettingUtils::getParamValueInTab(const char *tabName, const char *paramName) {
+  if (tabs.count(tabName) > 0) {
+    std::map<String, Parameter> &params = tabs[tabName];
+    auto it = params.find(paramName);
+    if (it != params.end()) {
+      return it->second.value;
+    } else {
+      DEBUG_MSG("Error: Parameter not found in the specified tab.");
+      return "";
+    }
+  } else {
+    DEBUG_MSG("Error: Tab not found.");
+    return "";
+  }
+}

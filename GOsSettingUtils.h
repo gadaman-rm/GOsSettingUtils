@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <LittleFS.h>
-//#define DEBUG_THROW_SERIAL
+#define DEBUG_THROW_SERIAL
 #include <iot_debug.h>
 #include <ArduinoJson.h>
 #include <map>
@@ -41,6 +41,11 @@ public:
   std::vector<String> getAllParamsInTab(const char *tabName);
 
   bool writeToJsonFile();
+
+  bool loadFromSettingsFile();
+
+  // Function to get the value of a parameter in the selected tab
+  String getParamValueInTab(const char *tabName, const char *paramName);
 
 private:
   bool initialized;
