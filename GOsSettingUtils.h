@@ -20,7 +20,7 @@ public:
   void addTab(const char *tabName);
 
   // Add a parameter to the current tab
-  void addParam(const char *paramName, const char *paramType);
+  void addParam(const char *paramName, const char *paramType, int editable);
 
   // Function to get the type of a parameter by its name
   String getParamType(const char *paramName);
@@ -53,6 +53,8 @@ private:
   {
     String type;
     String value;
+    int order;
+    int editable;
   };
   // Private variables and functions for internal use
   std::map<String, std::map<String, Parameter>> tabs;

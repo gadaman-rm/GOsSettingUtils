@@ -28,7 +28,7 @@ void GOsSettingUtils::addTab(const char *tabName)
   tabs[currentTab] = std::map<String, Parameter>();
 }
 
-void GOsSettingUtils::addParam(const char *paramName, const char *paramType)
+void GOsSettingUtils::addParam(const char *paramName, const char *paramType, int editable)
 {
   if (currentTab == "")
   {
@@ -36,7 +36,18 @@ void GOsSettingUtils::addParam(const char *paramName, const char *paramType)
     return;
   }
 
-  tabs[currentTab][paramName] = {paramType, ""};
+  int order = 0;
+  if (!tabs[currentTab].empty())
+  {
+    // Find the highest order value in the current tab and increment it for the new parameter
+    order = std::max_element(tabs[currentTab].begin(), tabs[currentTab].end(),
+                             [](const auto &a, const auto &b)
+                             { return a.second.order < b.second.order; })
+                ->second.order +
+            1;
+  }
+
+  tabs[currentTab][paramName] = {paramType, "", order, editable};
 }
 
 String GOsSettingUtils::getParamType(const char *paramName)
@@ -150,6 +161,8 @@ bool GOsSettingUtils::writeToJsonFile()
       paramObject["name"] = param.first;
       paramObject["type"] = param.second.type;
       paramObject["value"] = param.second.value;
+      paramObject["order"] = param.second.order;
+      paramObject["editable"] = param.second.editable;
     }
   }
   File settingListFile = LittleFS.open("/settingList.lst", "w");
@@ -214,17 +227,24 @@ bool GOsSettingUtils::loadFromSettingsFile()
   return true;
 }
 
-String GOsSettingUtils::getParamValueInTab(const char *tabName, const char *paramName) {
-  if (tabs.count(tabName) > 0) {
+String GOsSettingUtils::getParamValueInTab(const char *tabName, const char *paramName)
+{
+  if (tabs.count(tabName) > 0)
+  {
     std::map<String, Parameter> &params = tabs[tabName];
     auto it = params.find(paramName);
-    if (it != params.end()) {
+    if (it != params.end())
+    {
       return it->second.value;
-    } else {
+    }
+    else
+    {
       DEBUG_MSG("Error: Parameter not found in the specified tab.");
       return "";
     }
-  } else {
+  }
+  else
+  {
     DEBUG_MSG("Error: Tab not found.");
     return "";
   }
