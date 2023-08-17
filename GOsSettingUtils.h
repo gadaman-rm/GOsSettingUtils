@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <LittleFS.h>
-#define DEBUG_THROW_SERIAL
+//#define DEBUG_THROW_SERIAL
 #include <iot_debug.h>
 #include <ArduinoJson.h>
 #include <map>
