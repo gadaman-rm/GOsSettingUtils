@@ -28,7 +28,7 @@ void GOsSettingUtils::addTab(const char *tabName)
   tabs[currentTab] = std::map<String, Parameter>();
 }
 
-void GOsSettingUtils::addParam(const char *paramName, const char *paramType, int editable)
+void GOsSettingUtils::addParam(const char *paramName, const char *paramType, const char *selectArray, const char *description, int editable)
 {
   if (currentTab == "")
   {
@@ -47,7 +47,7 @@ void GOsSettingUtils::addParam(const char *paramName, const char *paramType, int
             1;
   }
 
-  tabs[currentTab][paramName] = {paramType, "", order, editable};
+  tabs[currentTab][paramName] = {paramType, "", selectArray, description, editable, order};
 }
 
 String GOsSettingUtils::getParamType(const char *paramName)
@@ -149,7 +149,7 @@ bool GOsSettingUtils::writeToJsonFile()
     return false;
   }
 
-  DynamicJsonDocument jsonDocument(2048); // Set the size of the JSON document
+  DynamicJsonDocument jsonDocument(4096); // Set the size of the JSON document
 
   // Iterate through all the tabs
   for (const auto &tab : tabs)
@@ -161,8 +161,12 @@ bool GOsSettingUtils::writeToJsonFile()
       paramObject["name"] = param.first;
       paramObject["type"] = param.second.type;
       paramObject["value"] = param.second.value;
-      paramObject["order"] = param.second.order;
+      if (param.second.selectArray != nullptr)
+        paramObject["selectArray"] = param.second.selectArray;
+      if (param.second.description != nullptr)
+        paramObject["description"] = param.second.description;
       paramObject["editable"] = param.second.editable;
+      paramObject["order"] = param.second.order;
     }
   }
   File settingListFile = LittleFS.open("/settingList.lst", "w");
