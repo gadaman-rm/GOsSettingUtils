@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <LittleFS.h>
-//#define DEBUG_THROW_SERIAL
+// #define DEBUG_THROW_SERIAL
 #include <iot_debug.h>
 #include <ArduinoJson.h>
 #include <map>
@@ -20,7 +20,7 @@ public:
   void addTab(const char *tabName);
 
   // Add a parameter to the current tab
-  void addParam(const char *paramName, const char *paramType, int editable);
+  void addParam(const char *paramName, const char *paramType, const char *selectArray, const char *description, int editable);
 
   // Function to get the type of a parameter by its name
   String getParamType(const char *paramName);
@@ -53,8 +53,10 @@ private:
   {
     String type;
     String value;
-    int order;
+    String selectArray;
+    String description;
     int editable;
+    int order;
   };
   // Private variables and functions for internal use
   std::map<String, std::map<String, Parameter>> tabs;
